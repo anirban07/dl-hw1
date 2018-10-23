@@ -60,7 +60,7 @@ matrix im2col(image im, int size, int stride)
     int w_i, h_i, c_i, x, y;
     // start is the value corresponding to the start and end points depending on filter size
     // The padding size is simply size / 2
-    int start = size / 2 - (size % 2 == 0 ? 1 : 0);
+    int start = (size - 1) / 2;
 
     for (c_i = 0; c_i < im.c; c_i++) {
         for (h_i = -start; h_i < im.h - start; h_i += stride) { // runs outh times
