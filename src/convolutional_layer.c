@@ -50,6 +50,37 @@ matrix im2col(image im, int size, int stride)
 
     // TODO: 5.1 - fill in the column matrix
 
+    // padding = size / 2 (integer division)
+    // if size is ODD:
+    //   start at (-padding, -padding)
+    //   end at (im.c - padding, im.w - padding)
+    // if size is EVEN:
+    //   start at (-(padding - 1), -(padding - 1))
+    //   end at (im.c - (padding - 1), im.w - (padding - 1))
+    int w_i, h_i, c_i, x, y;
+    // start is the value corresponding to the start and end points depending on filter size
+    // The padding size is simply size / 2
+    int start = size / 2 - (size % 2 == 0 ? 1 : 0);
+
+    for (c_i = 0; c_i < im.c; c_i++) {
+        for (h_i = -start; h_i < im.h - start; h_i += stride) { // runs outh times
+            for (x = 0; x < size; x++) {
+                for (y = 0; y < size; y++) {
+                    for (w_i = -start + y; w_i < im.w - start + y; w_i += stride) { // runs outw times
+                        float im_data_point;
+                        if ((h_i + x) < 0 || w_i < 0 || w_i >= im.w || (h_i + x) >= im.h) {
+                            im_data_point = 0;
+                        } else {
+                            im_data_point = im.data[(c_i * im.w * im.h) + ((h_i + x) * im.w) + w_i];
+                        }
+                        col.data[(c_i * cols * size * size) + (x * size + y) * cols + ((h_i + start) / stride * outw) + (w_i + start - y) / stride] = im_data_point;
+                    }
+                }
+            }
+            
+        }
+    }
+
     return col;
 }
 
