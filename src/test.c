@@ -175,7 +175,7 @@ void test_large() {
     int stride = 1;
 
     size_t i;
-    float im_data[im_h * im_w * num_ch];
+    float *im_data = malloc((im_h * im_w * num_ch) * sizeof(float));
     for (i = 0; i < im_h * im_w * num_ch; i++) {
         im_data[i] = i;
     }
@@ -188,6 +188,7 @@ void test_large() {
         matrix col = im2col(im, f_size, stride);
         free_matrix(col);
     }
+    free(im_data);
     printf("im2col elapsed %lf sec\n", what_time_is_it_now() - start);
 
 }
