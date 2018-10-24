@@ -40,6 +40,7 @@ layer make_convolutional_layer(int w, int h, int c, int filters, int size, int s
 layer make_maxpool_layer(int w, int h, int c, int size, int stride);
 
 matrix im2col(image im, int size, int stride);
+void col2im(matrix col, int size, int stride, image im);
 
 typedef struct {
     layer *layers;

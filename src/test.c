@@ -166,6 +166,41 @@ void test_im2col_2i_1c_3f_1s() {
     printf("test_im2col_2i_1c_3f_1s passed\n");
 }
 
+void test_im2col_3i_1c_3f_1s() {
+    int im_h = 3;
+    int im_w = 3;
+    int num_ch = 1;
+    int f_size = 3;
+    int stride = 1;
+
+    size_t i;
+    float im_data[im_h * im_w * num_ch];
+    float col_data[3 * 3 * 3 * 3] = {
+        0, 0, 0, 0, 1, 2, 0, 4, 5,
+        0, 0, 0, 1, 2, 3, 4, 5, 6,
+        0, 0, 0, 2, 3, 0, 5, 6, 0,
+        0, 1, 2, 0, 4, 5, 0, 7, 8,
+        1, 2, 3, 4, 5, 6, 7, 8, 9,
+        2, 3, 0, 5, 6, 0, 8, 9, 0,
+        0, 4, 5, 0, 7, 8, 0, 0, 0,
+        4, 5, 6, 7, 8, 9, 0, 0, 0,
+        5, 6, 0, 8, 9, 0, 0, 0, 0
+    };
+    for (i = 0; i < im_h * im_w * num_ch; i++) {
+        im_data[i] = i + 1;
+    }
+    image im = make_image(im_h, im_w, num_ch);
+    for (i = 0; i < im_h * im_w * num_ch; i++) {
+        im.data[i] = im_data[i];
+    }
+    matrix col = im2col(im, f_size, stride);
+
+    for (i = 0; i < 3 * 3 * 3 * 3; i++) {
+        assert(abs(col.data[i] - col_data[i]) < 0.0001);
+    }
+    printf("test_im2col_3i_1c_3f_1s passed\n");
+}
+
 void test_large() {
     int n = 32;
     int im_h = 512;
@@ -198,13 +233,97 @@ void test_im2col() {
     test_im2col_3i_2c_2f_1s();
     test_im2col_3i_1c_2f_2s();
     test_im2col_2i_1c_3f_1s();
-    test_large();
+    test_im2col_3i_1c_3f_1s();
+    // test_large();
+}
+
+void test_col2im_3i_1c_2f_1s() {
+    size_t i;
+    int im_h = 3;
+    int im_w = 3;
+    int num_ch = 1;
+    int f_size = 2;
+    int stride = 1;
+
+    int outw = (im_w-1)/stride + 1;
+    int outh = (im_h-1)/stride + 1;
+
+
+    float col_data[2 * 2 * 3 * 3] = {
+        1, 2, 3, 4, 5, 6, 7, 8, 9,
+        2, 3, 0, 5, 6, 0, 8, 9, 0,
+        4, 5, 6, 7, 8, 9, 0, 0, 0,
+        5, 6, 0, 8, 9, 0, 0, 0, 0
+    };
+
+    float im_data[3 * 3] = {
+        1, 4, 6,
+        8, 20, 24,
+        14, 32, 36
+    };
+
+    image im = make_image(im_w, im_h, num_ch);
+    matrix col = make_matrix(num_ch * f_size * f_size, outh * outw);
+    col.data = col_data;
+    col2im(col, f_size, stride, im);
+
+    for (i = 0; i < im_h * im_w; i++) {
+        assert(abs(im.data[i] - im_data[i]) < 0.0001);
+    }
+    printf("test_col2im_3i_1c_2f_1s passed\n");
+}
+
+void test_col2im_3i_1c_3f_1s() {
+    size_t i;
+    int im_h = 3;
+    int im_w = 3;
+    int num_ch = 1;
+    int f_size = 3;
+    int stride = 1;
+
+    int outw = (im_w-1)/stride + 1;
+    int outh = (im_h-1)/stride + 1;
+
+
+    float col_data[3 * 3 * 3 * 3] = {
+        0, 0, 0, 0, 1, 2, 0, 4, 5,
+        0, 0, 0, 1, 2, 3, 4, 5, 6,
+        0, 0, 0, 2, 3, 0, 5, 6, 0,
+        0, 1, 2, 0, 4, 5, 0, 7, 8,
+        1, 2, 3, 4, 5, 6, 7, 8, 9,
+        2, 3, 0, 5, 6, 0, 8, 9, 0,
+        0, 4, 5, 0, 7, 8, 0, 0, 0,
+        4, 5, 6, 7, 8, 9, 0, 0, 0,
+        5, 6, 0, 8, 9, 0, 0, 0, 0
+    };
+
+    float im_data[3 * 3] = {
+        4,  12,  12,
+        24,  45,  36,
+        28,  48,  36
+    };
+
+    image im = make_image(im_w, im_h, num_ch);
+    matrix col = make_matrix(num_ch * f_size * f_size, outh * outw);
+    col.data = col_data;
+    col2im(col, f_size, stride, im);
+
+    for (i = 0; i < im_h * im_w; i++) {
+        assert(abs(im.data[i] - im_data[i]) < 0.0001);
+    }
+    printf("test_col2im_3i_1c_3f_1s passed\n");
+}
+
+void test_col2im() {
+    test_col2im_3i_1c_2f_1s();
+    test_col2im_3i_1c_3f_1s();
 }
 
 void run_tests()
 {
     // test_matrix_speed();
     test_im2col();
+    test_col2im();
     //printf("%d tests, %d passed, %d failed\n", tests_total, tests_total-tests_fail, tests_fail);
 }
 

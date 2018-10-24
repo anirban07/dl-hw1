@@ -58,11 +58,15 @@ matrix im2col(image im, int size, int stride)
     //   start at (-(padding - 1), -(padding - 1))
     //   end at (im.c - (padding - 1), im.w - (padding - 1))
     int w_i, h_i, c_i, x, y;
+    float *col_channel_i;
+    float *im_channel_i;
     // start is the value corresponding to the start and end points depending on filter size
     // The padding size is simply size / 2
     int start = (size - 1) / 2;
 
     for (c_i = 0; c_i < im.c; c_i++) {
+        im_channel_i = &im.data[(c_i * im.w * im.h)];
+        col_channel_i = &col.data[(c_i * cols * size * size)];
         for (h_i = -start; h_i < im.h - start; h_i += stride) { // runs outh times
             for (x = 0; x < size; x++) {
                 for (y = 0; y < size; y++) {
@@ -71,13 +75,12 @@ matrix im2col(image im, int size, int stride)
                         if ((h_i + x) < 0 || w_i < 0 || w_i >= im.w || (h_i + x) >= im.h) {
                             im_data_point = 0;
                         } else {
-                            im_data_point = im.data[(c_i * im.w * im.h) + ((h_i + x) * im.w) + w_i];
+                            im_data_point = im_channel_i[((h_i + x) * im.w) + w_i];
                         }
-                        col.data[(c_i * cols * size * size) + (x * size + y) * cols + ((h_i + start) / stride * outw) + (w_i + start - y) / stride] = im_data_point;
+                        col_channel_i[(x * size + y) * cols + ((h_i + start) / stride * outw) + (w_i + start - y) / stride] = im_data_point;
                     }
                 }
             }
-            
         }
     }
 
@@ -97,7 +100,27 @@ void col2im(matrix col, int size, int stride, image im)
     int cols = outw * outh;
 
     // TODO: 5.2 - add values into image im from the column matrix
+    int w_i, h_i, c_i, x, y;
+    int start = (size - 1) / 2;
+    float *col_channel_i;
+    float *im_channel_i;
 
+    for (c_i = 0; c_i < im.c; c_i++) {
+        im_channel_i = &im.data[(c_i * im.w * im.h)];
+        col_channel_i = &col.data[(c_i * cols * size * size)];
+        for (h_i = -start; h_i < im.h - start; h_i += stride) { // runs outh times
+            for (x = 0; x < size; x++) {
+                for (y = 0; y < size; y++) {
+                    for (w_i = -start + y; w_i < im.w - start + y; w_i += stride) { // runs outw times
+                        if ((h_i + x) < 0 || w_i < 0 || w_i >= im.w || (h_i + x) >= im.h) {
+                            continue;
+                        }
+                        im_channel_i[((h_i + x) * im.w) + w_i] += col_channel_i[(x * size + y) * cols + ((h_i + start) / stride * outw) + (w_i + start - y) / stride];
+                    }
+                }
+            }
+        }
+    }
 }
 
 // Run a convolutional layer on input
