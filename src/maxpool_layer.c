@@ -20,7 +20,7 @@ matrix forward_maxpool_layer(layer l, matrix in)
     int start = (l.size - 1) / 2;
     for (im_i = 0; im_i < in.rows; im_i++) {
         float *im_i_data = &in.data[im_i * in.cols];
-        float *out_im_i_data = &out.data[im_i * in.cols];
+        float *out_im_i_data = &out.data[im_i * out.cols];
         for (c_i = 0; c_i < l.channels; c_i++) {
             float *chan_i = &im_i_data[c_i * l.height * l.width];
             float *out_chan_i = &out_im_i_data[c_i * outh * outw];
