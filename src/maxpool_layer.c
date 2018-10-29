@@ -101,7 +101,7 @@ void backward_maxpool_layer(layer l, matrix prev_delta)
                     }
                     int curr_out_col = (w_i + start) / l.stride;
                     int curr_out_row = (h_i + start) / l.stride;
-                    prev_delta_chan_i[max_row * l.width + max_col] = delta_chan_i[curr_out_row * outw + curr_out_col];
+                    prev_delta_chan_i[max_row * l.width + max_col] += delta_chan_i[curr_out_row * outw + curr_out_col];
                 }
             }
         }
