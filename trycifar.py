@@ -11,7 +11,7 @@ def neural_net():
 
 def conv_net():
     # How many operations are needed for a forard pass through this network?
-    # Your answer: 
+    # Your answer: 1108480
     l = [   make_convolutional_layer(32, 32, 3, 8, 3, 1, LRELU),
             make_maxpool_layer(32, 32, 8, 3, 2),
             make_convolutional_layer(16, 16, 8, 16, 3, 1, LRELU),
@@ -62,5 +62,9 @@ print("test accuracy:     %f", accuracy_net(m, test))
 # How accurate is the fully connected network vs the convnet when they use similar number of operations?
 # Why are you seeing these results? Speculate based on the information you've gathered and what you know about DL and ML.
 # Your answer:
-#
+# The convnet has an accuracy of about 65%
+# The fully connected network with the same number of operations has an accuracy of about 51%
+# This could be because fully connected networks look at the relation between pixels that are far apart
+# and this wastes operations. Given the same number of operations, convolutions look only at pixels that are
+# close by, thereby needing fewer operations, and getting better accuracy.
 
